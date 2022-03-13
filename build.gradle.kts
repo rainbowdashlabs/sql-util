@@ -15,7 +15,7 @@ repositories {
 dependencies {
     api("org.slf4j", "slf4j-api", "1.7.36")
 
-    api("com.zaxxer", "HikariCP", "4.0.3")
+    api("com.zaxxer", "HikariCP", "5.0.1")
     api("org.jetbrains", "annotations", "21.0.1")
 
     testImplementation("org.postgresql", "postgresql", "42.3.3")
