@@ -25,7 +25,7 @@ dependencies {
     api("com.zaxxer", "HikariCP", "5.0.1")
     api("org.jetbrains", "annotations", "23.0.0")
 
-    testImplementation("org.postgresql", "postgresql", "42.3.3")
+    testImplementation("org.postgresql", "postgresql", "42.3.4")
     testImplementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.4")
     testImplementation("mysql", "mysql-connector-java", "8.0.28")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
