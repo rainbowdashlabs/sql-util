@@ -27,7 +27,7 @@ dependencies {
 
     testImplementation("org.postgresql", "postgresql", "42.3.4")
     testImplementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.4")
-    testImplementation("mysql", "mysql-connector-java", "8.0.28")
+    testImplementation("mysql", "mysql-connector-java", "8.0.29")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
