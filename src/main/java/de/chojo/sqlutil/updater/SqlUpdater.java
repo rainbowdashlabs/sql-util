@@ -7,6 +7,7 @@
 package de.chojo.sqlutil.updater;
 
 import de.chojo.sqlutil.base.QueryFactoryHolder;
+import de.chojo.sqlutil.databases.SqlType;
 import de.chojo.sqlutil.logging.LoggerAdapter;
 import de.chojo.sqlutil.wrapper.QueryBuilderConfig;
 
@@ -18,7 +19,79 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ * An SQL updater which performs database updates via upgrade scripts.
+ * <p>
+ * A version is defined via version identifier {@code Major.Minor}.
+ * <p>
+ * There are three types of scripts:
+ * <p>
+ *
+ * <b>Setup</b>
+ * <p>
+ * Every Major version directory has to contain a {@code setup.sql} file. This file represents the inital state of the database version.
+ * <p>
+ * During the initial setup the {@code setup.sql} script of the highest major version is executed.
+ * <p>
+ *
+ * <b>Patch</b>
+ * <p>
+ * Every patch version requires a {@code patch_x.sql} file where {@code x} is the number of the minor version.
+ * <p>
+ * These files get applied one after another until the current version is reached.
+ * <p>
+ *
+ * <b>Migrate</b>
+ * <p>
+ * Every Major version which has a following major version requires a {@code migrate.sql} script.
+ * <p>
+ * This script should update the database to the same state as a clean installation via the new {@code setup.sql} would do.
+ *
+ *
+ * <pre>{@code
+ * database
+ * ├── postgres
+ * │   ├── 1                # 1.x
+ * │   │   ├── setup.sql    # 1.0
+ * │   │   ├── patch_1.sql  # 1.1
+ * │   │   ├── patch_2.sql  # 1.2
+ * │   │   ├── patch_3.sql  # 1.3
+ * │   │   └── migrate.sql  # 1.3 -> 2.0
+ * │   └── 2
+ * │       ├── setup.sql    # 2.0
+ * │       └── patch_1.sql  # 2.1
+ * └── mysql
+ *     ├── 1
+ *     │   ├── setup.sql
+ *     │   ├── patch_1.sql
+ *     │   ├── patch_2.sql
+ *     │   ├── patch_3.sql
+ *     │   └── migrate.sql
+ *     └── 2
+ *         ├── setup.sql
+ *         └── patch_1.sql
+ *       }</pre>
+ *
+ *
+ * <b>Setup Process</b>
+ * <p>
+ * During the update process the updater will look for a version table defined via {@link SqlUpdaterBuilder#setVersionTable(String)}.
+ * <p>
+ * If this table is not present it will be created and the highest setup script will be executed and all existing patches.
+ *
+ * <p>
+ * <b>Update Process</b>
+ * <p>
+ * If the version table is present the updater will read the version and execute all following patches including the migration scripts.
+ * <p>
+ * If the current version would be 1.2, but the target version would be 2.1 the following script would be executed:
+ *
+ * <pre>
+ *      - 1/patch_3.sql
+ *      - 1/migrate.sql
+ *      - 2/patch_1.sql
+ *  </pre>
+ */
 public class SqlUpdater extends QueryFactoryHolder {
     private final SqlVersion version;
     private final LoggerAdapter log;
@@ -37,6 +110,16 @@ public class SqlUpdater extends QueryFactoryHolder {
         this.version = version;
     }
 
+    /**
+     * Creates a new {@link SqlUpdaterBuilder} with a version set to a string located in {@code resources/database/version}.
+     * <p>
+     * This string requires the format {@code Major.Minor}. Patches are not supported.
+     *
+     * @param dataSource the data source to connect to the database
+     * @param type       the sql type of the database
+     * @return new builder instance
+     * @throws IOException if the version file does not exist.
+     */
     public static SqlUpdaterBuilder builder(DataSource dataSource, SqlType type) throws IOException {
         var version = "";
         try (var in = SqlUpdater.class.getClassLoader().getResourceAsStream("database/version")) {
@@ -47,6 +130,15 @@ public class SqlUpdater extends QueryFactoryHolder {
         return new SqlUpdaterBuilder(dataSource, new SqlVersion(Integer.parseInt(ver[0]), Integer.parseInt(ver[1])), type);
     }
 
+    /**
+     * Creates a new {@link SqlUpdaterBuilder} with a version set to a string located in {@code resources/database/version}.
+     *
+     * @param dataSource the data source to connect to the database
+     * @param version    the version with {@code Major.Minor}
+     * @param type       the sql type of the database
+     * @return
+     * @throws IOException
+     */
     public static SqlUpdaterBuilder builder(DataSource dataSource, SqlVersion version, SqlType type) throws IOException {
         return new SqlUpdaterBuilder(dataSource, version, type);
     }
@@ -231,26 +323,59 @@ public class SqlUpdater extends QueryFactoryHolder {
             this.type = type;
         }
 
+        /**
+         * The version table which contains major and minor version.
+         * <p>
+         * Changing this later might cause a loss of data.
+         *
+         * @param versionTable name of the version table
+         * @return builder instance
+         */
         public SqlUpdaterBuilder setVersionTable(String versionTable) {
             this.versionTable = versionTable;
             return this;
         }
 
+        /**
+         * Replacements which should be applied to the executed scripts. Can be used to change schema names
+         * or other variables during deployment
+         *
+         * @param replacements replacements
+         * @return builder instance
+         */
         public SqlUpdaterBuilder setReplacements(QueryReplacement... replacements) {
             this.replacements = replacements;
             return this;
         }
 
+        /**
+         * Set a logger adapter used for logging.
+         *
+         * @param logger logger adapter
+         * @return builder instance
+         */
         public SqlUpdaterBuilder withLogger(LoggerAdapter logger) {
             this.logger = logger;
             return this;
         }
 
+        /**
+         * Set the {@link QueryBuilderConfig} for the underlying {@link QueryFactoryHolder}
+         *
+         * @param config config so apply
+         * @return builder instance
+         */
         public SqlUpdaterBuilder withConfig(QueryBuilderConfig config) {
             this.config = config;
             return this;
         }
 
+        /**
+         * Build the updater and start the update process.
+         *
+         * @throws SQLException If execution of the scripts fails
+         * @throws IOException  If the scripts can't be read.
+         */
         public void execute() throws SQLException, IOException {
             var sqlUpdater = new SqlUpdater(source, config, versionTable, replacements, version, logger, type);
             sqlUpdater.init();
