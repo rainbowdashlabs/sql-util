@@ -6,12 +6,9 @@
 
 package de.chojo.sqlutil.datasource;
 
-import de.chojo.sqlutil.updater.SqlType;
+import de.chojo.sqlutil.databases.SqlType;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.mariadb.jdbc.MariaDbDataSource;
-import org.mariadb.jdbc.MariaDbPoolDataSource;
-import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.SQLException;
 
@@ -21,12 +18,13 @@ class DataSourceCreatorTest {
 
     //@Test
     public void postgresTest() throws SQLException {
-        var build = DataSourceCreator.create(SqlType.POSTGRES, PGSimpleDataSource.class)
-                .withAddress("localhost")
-                .forDatabase("postgres")
-                .withPort(5432)
-                .withUser("postgres")
-                .withPassword("root")
+        var build = DataSourceCreator.create(SqlType.POSTGRES)
+                .configure(builder -> builder
+                        .host("localhost")
+                        .database("postgres")
+                        .port(5432)
+                        .user("postgres")
+                        .password("root"))
                 .create()
                 .withMaximumPoolSize(20)
                 .withMinimumIdle(2)
@@ -37,12 +35,13 @@ class DataSourceCreatorTest {
 
     //@Test
     public void mariadbTest() throws SQLException {
-        var build = DataSourceCreator.create(SqlType.MARIADB, MariaDbDataSource.class)
-                .withAddress("localhost")
-                .forDatabase("test_db")
-                .withPort(3306)
-                .withUser("root")
-                .withPassword("root")
+        var build = DataSourceCreator.create(SqlType.MARIADB)
+                .configure(builder -> builder
+                        .host("localhost")
+                        .database("test_db")
+                        .port(3306)
+                        .user("root")
+                        .password("root"))
                 .create()
                 .withMaximumPoolSize(20)
                 .withMinimumIdle(2)
