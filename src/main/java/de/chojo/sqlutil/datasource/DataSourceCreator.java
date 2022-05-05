@@ -12,16 +12,20 @@ import de.chojo.sqlutil.databases.SqlType;
 import de.chojo.sqlutil.datasource.stage.ConfigurationStage;
 import de.chojo.sqlutil.datasource.stage.JdbcStage;
 import de.chojo.sqlutil.jdbc.JdbcConfig;
+import org.slf4j.Logger;
 
 import javax.sql.DataSource;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * Class to create a {@link HikariDataSource} with a builder pattern.
  */
 public class DataSourceCreator<T extends JdbcConfig<?>> implements JdbcStage<T>, ConfigurationStage {
+    private static final Logger log = getLogger(DataSourceCreator.class);
     private HikariConfig hikariConfig;
     private final T builder;
 
@@ -36,7 +40,7 @@ public class DataSourceCreator<T extends JdbcConfig<?>> implements JdbcStage<T>,
      * @return a {@link DataSourceCreator} in {@link JdbcStage}.
      */
     public static <T extends JdbcConfig<?>> JdbcStage<T> create(SqlType<T> type) {
-        return create(type);
+        return new DataSourceCreator<>(type);
     }
 
     @Override
@@ -47,8 +51,10 @@ public class DataSourceCreator<T extends JdbcConfig<?>> implements JdbcStage<T>,
 
     @Override
     public ConfigurationStage create() {
+        var jdbcUrl = builder.jdbcUrl();
+        log.info("Creating Hikari config using jdbc url: {}", jdbcUrl);
         hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(builder.jdbcUrl());
+        hikariConfig.setJdbcUrl(jdbcUrl);
         return this;
     }
 

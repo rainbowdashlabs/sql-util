@@ -6,42 +6,116 @@
 
 package de.chojo.sqlutil.jdbc;
 
+import java.util.regex.Pattern;
+
 public abstract class RemoteJdbcConfig<T extends RemoteJdbcConfig<?>> extends JdbcConfig<T> {
-    private String host = "localhost";
+    private static final Pattern IPV4 = Pattern.compile("^(?:\\d{1,3}\\.){3}\\d{1,3}$");
+    private static final Pattern IPV6 = Pattern.compile(
+            "(([\\da-fA-F]{1,4}:){7}[\\da-fA-F]{1,4}|([\\da-fA-F]{1,4}:){1,7}:|([\\da-fA-F]{1,4}:){1,6}:[\\da-fA-F]{1,4}|([\\da-fA-F]{1,4}:){1,5}(:[\\da-fA-F]{1,4}){1,2}|([\\da-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([\\da-fA-F]{1,4}:){1,3}(:[\\da-fA-F]{1,4}){1,4}|([\\da-fA-F]{1,4}:){1,2}(:[\\da-fA-F]{1,4}){1,5}|[\\da-fA-F]{1,4}:((:[\\da-fA-F]{1,4}){1,6})|:((:[\\da-fA-F]{1,4}){1,7}|:)|fe80:(:[\\da-fA-F]{0,4}){0,4}%[\\da-zA-Z]+|::(ffff(:0{1,4})?:)?((25[0-5]|(2[0-4]|1?\\d)?\\d)\\.){3}(25[0-5]|(2[0-4]|1?\\d)?\\d)|([\\da-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1?\\d)?\\d)\\.){3}(25[0-5]|(2[0-4]|1?\\d)?\\d))");
+    private String host;
     private String port;
     private String database;
 
+    /**
+     * Sets the host explicit to local host.
+     * <p>
+     * This is usually the default value defined by jdbc drivers.
+     *
+     * @return builder instance
+     */
+    public T localhost() {
+        return host("localhost");
+    }
+
+    /**
+     * Set the host name of the connection
+     *
+     * @param host host
+     * @return builder instance
+     */
     public T host(String host) {
         this.host = host;
         return self();
     }
 
-    public T ipv4(String host) {
-        //TODO validation
-        return host(host);
+    /**
+     * Sets the host to a ipv4 address.
+     * This address must be a valid ipv4 address
+     *
+     * @param ipv4 ipv4 address
+     * @return builder instance
+     * @throws IllegalArgumentException when an invalid ipv4 was passed
+     */
+    public T ipv4(String ipv4) {
+        if (!IPV4.matcher(ipv4).matches()) {
+            throw new IllegalArgumentException("The ip " + ipv4 + " is not a valid ipv4 address");
+        }
+        return host(ipv4);
     }
 
-    public T ipv6(String host) {
-        //TODO validation
-        if (host.startsWith("[") && host.endsWith("]")) {
-            return host(host);
+    /**
+     * Sets the host to a ipv6 address.
+     * <p>
+     * This address must be a valid ipv6 address.
+     * <p>
+     * The method will ensure that the ipv6 address is surrounded by [...], which is required by jdbc.
+     *
+     * @param ipv6 ipv6 address
+     * @return builder instance
+     * @throws IllegalArgumentException when an invalid ipv6 was passed
+     */
+    public T ipv6(String ipv6) {
+        ipv6 = ipv6.replaceAll("[\\[\\]]", "");
+        if (!IPV6.matcher(ipv6).matches()) {
+            throw new IllegalArgumentException("The ip " + ipv6 + " is not a valid ipv6 address");
         }
-        if (!host.startsWith("[") && !host.endsWith("]")) {
-            return host(String.format("[%s]", host));
-        }
-        throw new IllegalArgumentException("Unbalanced bracket");
+        return host(String.format("[%s]", ipv6));
     }
 
+    /**
+     * Set the port.
+     *
+     * @param port port
+     * @return builder instance
+     * @throws IllegalArgumentException when the port is not a number
+     * @throws IllegalArgumentException when the port is smaller than 1 or larger than 65535
+     */
     public T port(String port) {
+        try {
+            var val = Integer.parseInt(port);
+            if (val < 1 || val > 65535) {
+                throw new IllegalArgumentException("Port \"" + port + "\" is out of range. Valid range is 1-65535");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Port \"" + port + "\" is not a number", e);
+        }
         this.port = port;
         return self();
     }
 
+    /**
+     * Set the port.
+     *
+     * @param port port
+     * @return builder instance
+     * @throws IllegalArgumentException when the port is smaller than 1 or larger than 65535
+     */
     public T port(int port) {
         return port(String.valueOf(port));
     }
 
+    /**
+     * Sets the database for the connection.
+     * <p>
+     * Most drivers default to the user name if not entered.
+     *
+     * @param database database
+     * @return builder instance
+     */
     public T database(String database) {
+        if (database.isBlank()) {
+            throw new IllegalArgumentException("Database name is empty");
+        }
         this.database = database;
         return self();
     }
@@ -51,6 +125,10 @@ public abstract class RemoteJdbcConfig<T extends RemoteJdbcConfig<?>> extends Jd
         var jdbc = new StringBuilder("jdbc:")
                 .append(driver())
                 .append(":");
+
+        if (port != null && host == null) {
+            throw new IllegalStateException("A port can not be defined without defining a host.");
+        }
 
         if (host != null) {
             jdbc.append("//").append(host);
@@ -83,7 +161,7 @@ public abstract class RemoteJdbcConfig<T extends RemoteJdbcConfig<?>> extends Jd
      * @return builder instance
      */
     public T password(String password) {
-        return addProperty("password", password);
+        return addParameter("password", password);
     }
 
     /**
@@ -93,6 +171,6 @@ public abstract class RemoteJdbcConfig<T extends RemoteJdbcConfig<?>> extends Jd
      * @return builder instance
      */
     public T user(String user) {
-        return addProperty("user", user);
+        return addParameter("user", user);
     }
 }

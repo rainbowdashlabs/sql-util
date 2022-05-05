@@ -20,7 +20,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc connectTimeout(int millis) {
-        return addProperty("connectTimeout", millis);
+        return addParameter("connectTimeout", millis);
     }
 
     /**
@@ -31,7 +31,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc useServerPrepStmts() {
-        return addProperty("useServerPrepStmts", true);
+        return addParameter("useServerPrepStmts", true);
     }
 
     /**
@@ -42,7 +42,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc allowLocalInfile() {
-        return addProperty("allowLocalInfile", true);
+        return addParameter("allowLocalInfile", true);
     }
 
     /**
@@ -54,7 +54,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc sslMode(SslMode sslMode) {
-        return addProperty("sslMode", sslMode);
+        return addParameter("sslMode", sslMode);
     }
 
     /**
@@ -70,7 +70,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc serverSslCert(String path) {
-        return addProperty("serverSslCert", path);
+        return addParameter("serverSslCert", path);
     }
 
     /**
@@ -80,7 +80,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc keyStore(String path) {
-        return addProperty("keyStore", path);
+        return addParameter("keyStore", path);
     }
 
     /**
@@ -90,7 +90,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc keyStorePassword(String password) {
-        return addProperty("keyStorePassword", password);
+        return addParameter("keyStorePassword", password);
     }
 
     /**
@@ -104,7 +104,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc enabledSslCipherSuites(String ciphers) {
-        return addProperty("enabledSslCipherSuites", ciphers);
+        return addParameter("enabledSslCipherSuites", ciphers);
     }
 
     /**
@@ -114,7 +114,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc keyStoreType(String type) {
-        return addProperty("keyStoreType", type);
+        return addParameter("keyStoreType", type);
     }
 
     /**
@@ -125,7 +125,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc maxQuerySizeToLog(int maxQuerySizeToLog) {
-        return addProperty("maxQuerySizeToLog", maxQuerySizeToLog);
+        return addParameter("maxQuerySizeToLog", maxQuerySizeToLog);
     }
 
     /**
@@ -135,7 +135,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc allowMultiQueries(boolean state) {
-        return addProperty("allowMultiQueries", state);
+        return addParameter("allowMultiQueries", state);
     }
 
     /**
@@ -154,7 +154,7 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @return builder instance
      */
     public MariaDbJdbc dumpQueriesOnException(boolean state) {
-        return addProperty("dumpQueriesOnException", state);
+        return addParameter("dumpQueriesOnException", state);
     }
 
     /**
@@ -163,8 +163,8 @@ public class MariaDbJdbc extends RemoteJdbcConfig<MariaDbJdbc> {
      * @see <a href="https://mariadb.com/kb/en/about-mariadb-connector-j/">MariaDb parameter</a>
      */
     @Override
-    public <V> MariaDbJdbc addProperty(String key, V value) {
-        return super.addProperty(key, value);
+    public <V> MariaDbJdbc addParameter(String key, V value) {
+        return super.addParameter(key, value);
     }
 
     public enum SslMode {

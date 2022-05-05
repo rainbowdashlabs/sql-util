@@ -65,8 +65,8 @@ public class SqLiteJdbc extends JdbcConfig<SqLiteJdbc> {
      * @see <a href="https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html/">MySql parameter</a>
      */
     @Override
-    public <V> SqLiteJdbc addProperty(String key, V value) {
-        return super.addProperty(key, value);
+    public <V> SqLiteJdbc addParameter(String key, V value) {
+        return super.addParameter(key, value);
     }
 
     @Override

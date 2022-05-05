@@ -7,11 +7,13 @@
 package de.chojo.sqlutil;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+//TODO: Setup testcontainers properly with workflow
 @Testcontainers
 public class TestContainers {
 
