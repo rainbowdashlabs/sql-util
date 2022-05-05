@@ -39,7 +39,7 @@ public abstract class RemoteJdbcConfig<T extends RemoteJdbcConfig<?>> extends Jd
     }
 
     /**
-     * Sets the host to a ipv4 address.
+     * Sets the host to an ipv4 address.
      * This address must be a valid ipv4 address
      *
      * @param ipv4 ipv4 address
@@ -54,7 +54,7 @@ public abstract class RemoteJdbcConfig<T extends RemoteJdbcConfig<?>> extends Jd
     }
 
     /**
-     * Sets the host to a ipv6 address.
+     * Sets the host to an ipv6 address.
      * <p>
      * This address must be a valid ipv6 address.
      * <p>
@@ -107,7 +107,7 @@ public abstract class RemoteJdbcConfig<T extends RemoteJdbcConfig<?>> extends Jd
     /**
      * Sets the database for the connection.
      * <p>
-     * Most drivers default to the user name if not entered.
+     * Most drivers default to the username if not entered.
      *
      * @param database database
      * @return builder instance

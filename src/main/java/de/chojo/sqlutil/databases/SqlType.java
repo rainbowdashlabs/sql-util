@@ -16,6 +16,8 @@ import java.util.Arrays;
 
 /**
  * Defines a sql type and handles RDBMS specific actions.
+ *
+ * @param <T> type of the database defined by the {@link SqlType}
  */
 public interface SqlType<T extends JdbcConfig<?>> {
 
@@ -82,14 +84,30 @@ public interface SqlType<T extends JdbcConfig<?>> {
      */
     String deleteVersion(String table);
 
+    /**
+     * Returns the {@link JdbcConfig} implementation for this database
+     *
+     * @return jdbc builder
+     */
     T jdbcBuilder();
 
+    /**
+     * If the db does not allow to execute multiple queries this function should return every query in one string
+     *
+     * @param queries queries
+     * @return splitted queries if needed
+     */
     default String[] splitStatements(String queries) {
         return new String[]{queries};
     }
 
+    /**
+     * Function supposed to clean statements by removing empty statements
+     *
+     * @param queries queries
+     * @return a new array
+     */
     default String[] cleanStatements(String[] queries) {
         return Arrays.stream(queries).filter(query -> !query.isBlank()).toArray(String[]::new);
     }
-
 }

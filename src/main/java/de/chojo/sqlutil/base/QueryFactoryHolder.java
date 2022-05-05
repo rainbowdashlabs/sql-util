@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Can be used instead of a {@link DataHolder}
  */
 public abstract class QueryFactoryHolder extends DataHolder {
-    QueryBuilderFactory factory;
+    private final QueryBuilderFactory factory;
 
     /**
      * Create a new QueryFactoryholder
@@ -39,7 +39,7 @@ public abstract class QueryFactoryHolder extends DataHolder {
     /**
      * Create a new query builder with a defined return type. Use it for selects.
      *
-     * @param clazz class of required return type. Doesnt matter if you want a list or single result.
+     * @param clazz class of required return type. Doesn't matter if you want a list or single result.
      * @param <T>   type if result as class
      * @return a new query builder in a {@link QueryStage}
      */
@@ -56,10 +56,18 @@ public abstract class QueryFactoryHolder extends DataHolder {
         return factory.builder();
     }
 
+    /**
+     * Get the underlying factory
+     * @return query factory
+     */
     public QueryBuilderFactory factory() {
         return factory;
     }
 
+    /**
+     * Get the underlying data source
+     * @return datasource
+     */
     public DataSource source() {
         return factory.source();
     }

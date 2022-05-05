@@ -7,10 +7,6 @@
 package de.chojo.sqlutil.databases;
 
 import de.chojo.sqlutil.jdbc.MariaDbJdbc;
-import de.chojo.sqlutil.jdbc.MySQLJdbc;
-
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class MariaDb extends DefaultType<MariaDbJdbc> {
 

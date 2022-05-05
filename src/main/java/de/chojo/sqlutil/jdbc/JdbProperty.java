@@ -9,6 +9,10 @@ package de.chojo.sqlutil.jdbc;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * A key value pair used to represent url parameter
+ * @param <T>
+ */
 public class JdbProperty<T> {
     private final String key;
     private final T value;
@@ -31,7 +35,7 @@ public class JdbProperty<T> {
         if (this == o) return true;
         if (!(o instanceof JdbProperty)) return false;
 
-        JdbProperty<?> that = (JdbProperty<?>) o;
+        var that = (JdbProperty<?>) o;
 
         return key.equals(that.key);
     }

@@ -12,7 +12,8 @@ public class QueryReplacement {
 
     /**
      * Creates a new replacement
-     * @param target regular expression for the target
+     *
+     * @param target      regular expression for the target
      * @param replacement replacement of the target
      */
     public QueryReplacement(String target, String replacement) {

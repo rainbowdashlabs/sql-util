@@ -6,11 +6,16 @@
 
 package de.chojo.sqlutil.jdbc;
 
-import java.util.HashSet;
+import de.chojo.sqlutil.databases.SqlType;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * A basic jdbc config
+ * @param <T> type of config
+ */
 public abstract class JdbcConfig<T extends JdbcConfig<?>> {
     private final Set<JdbProperty<?>> parameter = new LinkedHashSet<>();
 
@@ -23,8 +28,10 @@ public abstract class JdbcConfig<T extends JdbcConfig<?>> {
 
     /**
      * Returns the instance with the correct type.
+     *
      * @return instance
      */
+    @SuppressWarnings("unchecked")
     protected T self() {
         return (T) this;
     }
@@ -45,6 +52,10 @@ public abstract class JdbcConfig<T extends JdbcConfig<?>> {
         return self();
     }
 
+    /**
+     * Returns the base url without parameter
+     * @return base url
+     */
     protected abstract String baseUrl();
 
     /**

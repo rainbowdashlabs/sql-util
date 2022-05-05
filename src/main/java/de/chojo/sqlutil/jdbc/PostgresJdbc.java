@@ -122,7 +122,7 @@ public class PostgresJdbc extends RemoteJdbcConfig<PostgresJdbc> {
      * If provided will be used by ConsoleCallbackHandler
      *
      * @param sslpassword sslpassword
-     * @return builder instance 
+     * @return builder instance
      */
     public PostgresJdbc sslpassword(int sslpassword) {
         return addParameter("sslpassword", sslpassword);
@@ -132,7 +132,7 @@ public class PostgresJdbc extends RemoteJdbcConfig<PostgresJdbc> {
      * Allow multi-queries like {@code insert into ab (i) values (1); insert into ab (i) values}
      *
      * @param state state. Default: false
-     * @return builder instance 
+     * @return builder instance
      */
     public PostgresJdbc allowMultiQueries(boolean state) {
         return addParameter("allowMultiQueries", state);
@@ -141,7 +141,7 @@ public class PostgresJdbc extends RemoteJdbcConfig<PostgresJdbc> {
     /**
      * Allow multi-queries like {@code insert into ab (i) values (1); insert into ab (i) values}
      *
-     * @return builder instance 
+     * @return builder instance
      */
     public PostgresJdbc allowMultiQueries() {
         return allowMultiQueries(true);
@@ -151,7 +151,7 @@ public class PostgresJdbc extends RemoteJdbcConfig<PostgresJdbc> {
      * If set to 'true', an exception is thrown during query execution containing a query string.
      *
      * @param state state. Default: false
-     * @return builder instance 
+     * @return builder instance
      */
     public PostgresJdbc dumpQueriesOnException(boolean state) {
         return addParameter("dumpQueriesOnException", state);
@@ -159,6 +159,7 @@ public class PostgresJdbc extends RemoteJdbcConfig<PostgresJdbc> {
 
     /**
      * {@inheritDoc}
+     *
      * @see <a href="https://jdbc.postgresql.org/documentation/head/connect.html">Postgres parameter</a>
      */
     @Override

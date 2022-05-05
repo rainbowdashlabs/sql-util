@@ -103,7 +103,7 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
 
     @Override
     public QueryStage<T> defaultConfig() {
-        config = QueryBuilderConfig.DEFAULT;
+        config = QueryBuilderConfig.defaultConfig();
         return this;
     }
 

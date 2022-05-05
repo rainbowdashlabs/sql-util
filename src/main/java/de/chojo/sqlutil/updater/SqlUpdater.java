@@ -8,6 +8,7 @@ package de.chojo.sqlutil.updater;
 
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.chojo.sqlutil.databases.SqlType;
+import de.chojo.sqlutil.jdbc.JdbcConfig;
 import de.chojo.sqlutil.logging.LoggerAdapter;
 import de.chojo.sqlutil.wrapper.QueryBuilderConfig;
 
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * An SQL updater which performs database updates via upgrade scripts.
  * <p>
- * A version is defined via version identifier {@code Major.Minor}.
+ * A version is defined via version identifier {@code Major.Patch}.
  * <p>
  * There are three types of scripts:
  * <p>
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
  *
  * <b>Patch</b>
  * <p>
- * Every patch version requires a {@code patch_x.sql} file where {@code x} is the number of the minor version.
+ * Every patch version requires a {@code patch_x.sql} file where {@code x} is the number of the patch version.
  * <p>
  * These files get applied one after another until the current version is reached.
  * <p>
@@ -92,15 +93,15 @@ import java.util.stream.Collectors;
  *      - 2/patch_1.sql
  *  </pre>
  */
-public class SqlUpdater extends QueryFactoryHolder {
+public class SqlUpdater<T extends JdbcConfig<?>> extends QueryFactoryHolder {
     private final SqlVersion version;
     private final LoggerAdapter log;
     private final DataSource source;
     private final String versionTable;
     private final QueryReplacement[] replacements;
-    private final SqlType type;
+    private final SqlType<T> type;
 
-    private SqlUpdater(DataSource source, QueryBuilderConfig config, String versionTable, QueryReplacement[] replacements, SqlVersion version, LoggerAdapter loggerAdapter, SqlType type) {
+    private SqlUpdater(DataSource source, QueryBuilderConfig config, String versionTable, QueryReplacement[] replacements, SqlVersion version, LoggerAdapter loggerAdapter, SqlType<T> type) {
         super(source, config);
         this.source = source;
         this.versionTable = versionTable;
@@ -113,17 +114,18 @@ public class SqlUpdater extends QueryFactoryHolder {
     /**
      * Creates a new {@link SqlUpdaterBuilder} with a version set to a string located in {@code resources/database/version}.
      * <p>
-     * This string requires the format {@code Major.Minor}. Patches are not supported.
+     * This string requires the format {@code Major.Patch}. Patches are not supported.
      *
      * @param dataSource the data source to connect to the database
      * @param type       the sql type of the database
+     * @param <T>        type of the database defined by the {@link SqlType}
      * @return new builder instance
      * @throws IOException if the version file does not exist.
      */
-    public static SqlUpdaterBuilder builder(DataSource dataSource, SqlType type) throws IOException {
+    public static <T extends JdbcConfig<?>> SqlUpdaterBuilder builder(DataSource dataSource, SqlType<T> type) throws IOException {
         var version = "";
-        try (var in = SqlUpdater.class.getClassLoader().getResourceAsStream("database/version")) {
-            version = new String(in.readAllBytes()).trim();
+        try (var versionFile = SqlUpdater.class.getClassLoader().getResourceAsStream("database/version")) {
+            version = new String(versionFile.readAllBytes()).trim();
         }
 
         var ver = version.split("\\.");
@@ -134,16 +136,16 @@ public class SqlUpdater extends QueryFactoryHolder {
      * Creates a new {@link SqlUpdaterBuilder} with a version set to a string located in {@code resources/database/version}.
      *
      * @param dataSource the data source to connect to the database
-     * @param version    the version with {@code Major.Minor}
+     * @param version    the version with {@code Major.Patch}
      * @param type       the sql type of the database
-     * @return
-     * @throws IOException
+     * @param <T>        type of the database defined by the {@link SqlType}
+     * @return builder instance
      */
-    public static SqlUpdaterBuilder builder(DataSource dataSource, SqlVersion version, SqlType type) throws IOException {
-        return new SqlUpdaterBuilder(dataSource, version, type);
+    public static <T extends JdbcConfig<?>> SqlUpdaterBuilder<T> builder(DataSource dataSource, SqlVersion version, SqlType<T> type) {
+        return new SqlUpdaterBuilder<>(dataSource, version, type);
     }
 
-    public void init() throws IOException, SQLException {
+    private void init() throws IOException, SQLException {
         forceDatabaseConsistency();
 
         var versionInfo = getVersionInfo();
@@ -199,8 +201,8 @@ public class SqlUpdater extends QueryFactoryHolder {
             }
 
             try (var stmt = conn.prepareStatement(type.getVersion(versionTable))) {
-                var rs = stmt.executeQuery();
-                if (!rs.next()) {
+                var resultSet = stmt.executeQuery();
+                if (!resultSet.next()) {
                     log.info("Version table " + versionTable + " is empty. Attempting database setup.");
                     isSetup = true;
                 }
@@ -286,9 +288,9 @@ public class SqlUpdater extends QueryFactoryHolder {
     }
 
     private String loadFromResource(Object... path) throws IOException {
-        var p = Arrays.stream(path).map(Object::toString).collect(Collectors.joining("/"));
-        try (var in = getClass().getClassLoader().getResourceAsStream("database/" + type.getName() + "/" + p)) {
-            return new String(in.readAllBytes());
+        var patch = Arrays.stream(path).map(Object::toString).collect(Collectors.joining("/"));
+        try (var patchFile = getClass().getClassLoader().getResourceAsStream("database/" + type.getName() + "/" + patch)) {
+            return new String(patchFile.readAllBytes());
         }
     }
 
@@ -308,30 +310,35 @@ public class SqlUpdater extends QueryFactoryHolder {
         return result;
     }
 
-    public static class SqlUpdaterBuilder {
+    /**
+     * Class to build a {@link SqlUpdater} with a builder pattern
+     *
+     * @param <T> The type of the jdbc link defined by the {@link SqlType}
+     */
+    public static class SqlUpdaterBuilder<T extends JdbcConfig<?>> {
         private final DataSource source;
         private final SqlVersion version;
-        private final SqlType type;
+        private final SqlType<T> type;
         private String versionTable = "version";
         private QueryReplacement[] replacements = new QueryReplacement[0];
         private LoggerAdapter logger;
         private QueryBuilderConfig config = QueryBuilderConfig.builder().throwExceptions().build();
 
-        public SqlUpdaterBuilder(DataSource dataSource, SqlVersion version, SqlType type) {
+        private SqlUpdaterBuilder(DataSource dataSource, SqlVersion version, SqlType<T> type) {
             this.source = dataSource;
             this.version = version;
             this.type = type;
         }
 
         /**
-         * The version table which contains major and minor version.
+         * The version table which contains major and patch version.
          * <p>
          * Changing this later might cause a loss of data.
          *
          * @param versionTable name of the version table
          * @return builder instance
          */
-        public SqlUpdaterBuilder setVersionTable(String versionTable) {
+        public SqlUpdaterBuilder<T> setVersionTable(String versionTable) {
             this.versionTable = versionTable;
             return this;
         }
@@ -343,7 +350,7 @@ public class SqlUpdater extends QueryFactoryHolder {
          * @param replacements replacements
          * @return builder instance
          */
-        public SqlUpdaterBuilder setReplacements(QueryReplacement... replacements) {
+        public SqlUpdaterBuilder<T> setReplacements(QueryReplacement... replacements) {
             this.replacements = replacements;
             return this;
         }
@@ -354,7 +361,7 @@ public class SqlUpdater extends QueryFactoryHolder {
          * @param logger logger adapter
          * @return builder instance
          */
-        public SqlUpdaterBuilder withLogger(LoggerAdapter logger) {
+        public SqlUpdaterBuilder<T> withLogger(LoggerAdapter logger) {
             this.logger = logger;
             return this;
         }
@@ -365,7 +372,7 @@ public class SqlUpdater extends QueryFactoryHolder {
          * @param config config so apply
          * @return builder instance
          */
-        public SqlUpdaterBuilder withConfig(QueryBuilderConfig config) {
+        public SqlUpdaterBuilder<T> withConfig(QueryBuilderConfig config) {
             this.config = config;
             return this;
         }
@@ -377,7 +384,7 @@ public class SqlUpdater extends QueryFactoryHolder {
          * @throws IOException  If the scripts can't be read.
          */
         public void execute() throws SQLException, IOException {
-            var sqlUpdater = new SqlUpdater(source, config, versionTable, replacements, version, logger, type);
+            var sqlUpdater = new SqlUpdater<>(source, config, versionTable, replacements, version, logger, type);
             sqlUpdater.init();
         }
     }
