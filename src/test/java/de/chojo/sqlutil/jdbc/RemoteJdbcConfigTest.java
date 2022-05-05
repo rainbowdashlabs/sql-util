@@ -1,3 +1,9 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) 2022 RainbowDashLabs and Contributor
+ */
+
 package de.chojo.sqlutil.jdbc;
 
 import org.junit.jupiter.api.Assertions;
@@ -76,14 +82,12 @@ class RemoteJdbcConfigTest {
     }
 
     @Test
-    void testIpv6() {
-        var jdbcUrl = jdbc.ipv6("1:2:3:4:5:6:7:8").port("1234").database("database").jdbcUrl();
-        Assertions.assertEquals("jdbc:driver://[1:2:3:4:5:6:7:8]:1234/database", jdbcUrl);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> jdbc.ipv4("1:1"));
+    void testIpv6Format() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> jdbc.ipv6("1:1"));
     }
 
     @Test
-    void testipv6() {
+    void testIpv6() {
         var jdbcUrl = jdbc.ipv6("1:2:3:4:5:6:7:8").port("1234").database("database").jdbcUrl();
         Assertions.assertEquals("jdbc:driver://[1:2:3:4:5:6:7:8]:1234/database", jdbcUrl);
     }

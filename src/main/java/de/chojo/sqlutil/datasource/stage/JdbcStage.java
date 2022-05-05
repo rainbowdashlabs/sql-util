@@ -6,8 +6,6 @@
 
 package de.chojo.sqlutil.datasource.stage;
 
-import de.chojo.sqlutil.datasource.DbConfig;
-
 import java.util.function.Consumer;
 
 /**
@@ -15,6 +13,11 @@ import java.util.function.Consumer;
  */
 public interface JdbcStage<T> {
 
+    /**
+     * configure the jdbc builder
+     * @param builder builder
+     * @return builder isntance
+     */
     JdbcStage<T> configure(Consumer<T> builder);
 
     /**

@@ -44,7 +44,8 @@ You can change the current used logger adapter via `DataHolder.setupLogger(Logge
 
 ### QueryBuilder
 
-You can obtain a [QueryBuilder](#QueryBuilder) directly inside a QueryObject via `QueryBuilder#queryBuilder(Class<T>)`.\
+You can obtain a [QueryBuilder](#QueryBuilder) directly inside a QueryObject via `QueryBuilder#queryBuilder
+(Class<T>)`.\
 Read more at the [QueryBuilder](#QueryBuilder) section.
 
 ### Connection

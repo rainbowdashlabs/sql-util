@@ -8,7 +8,6 @@ package de.chojo.sqlutil.wrapper;
 
 import de.chojo.sqlutil.wrapper.exception.QueryExecutionException;
 
-import java.lang.ref.Reference;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +22,7 @@ public class QueryBuilderConfig {
     /**
      * Contains the default configuration.
      */
-    public static AtomicReference<QueryBuilderConfig> DEFAULT = new AtomicReference<>(builder().build());
+    private static final AtomicReference<QueryBuilderConfig> DEFAULT = new AtomicReference<>(builder().build());
 
     private final boolean throwing;
     private final boolean atomic;

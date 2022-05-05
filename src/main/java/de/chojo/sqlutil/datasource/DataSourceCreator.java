@@ -23,11 +23,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Class to create a {@link HikariDataSource} with a builder pattern.
+ * @param <T> database type defined by the {@link SqlType}
  */
 public class DataSourceCreator<T extends JdbcConfig<?>> implements JdbcStage<T>, ConfigurationStage {
     private static final Logger log = getLogger(DataSourceCreator.class);
-    private HikariConfig hikariConfig;
     private final T builder;
+    private HikariConfig hikariConfig;
 
     private DataSourceCreator(SqlType<T> type) {
         this.builder = type.jdbcBuilder();
@@ -37,6 +38,7 @@ public class DataSourceCreator<T extends JdbcConfig<?>> implements JdbcStage<T>,
      * Create a new DataSource creator.
      *
      * @param type The type of database which is targeted by this data source
+     * @param <T> database type defined by the {@link SqlType}
      * @return a {@link DataSourceCreator} in {@link JdbcStage}.
      */
     public static <T extends JdbcConfig<?>> JdbcStage<T> create(SqlType<T> type) {
@@ -101,7 +103,7 @@ public class DataSourceCreator<T extends JdbcConfig<?>> implements JdbcStage<T>,
     }
 
     @Override
-    public DataSourceCreator withDataSourceClassName(Class<? extends DataSource> className) {
+    public DataSourceCreator<T> withDataSourceClassName(Class<? extends DataSource> className) {
         hikariConfig.setDataSourceClassName(className.getName());
         return this;
     }

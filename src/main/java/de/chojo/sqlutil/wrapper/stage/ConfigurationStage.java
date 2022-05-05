@@ -26,6 +26,18 @@ public interface ConfigurationStage<T> {
      * @param config The config of the {@link QueryBuilder}
      * @return The {@link QueryBuilder} in {@link QueryStage} with the config set.
      */
+    default QueryStage<T> configure(QueryBuilderConfig config) {
+        return configure(new AtomicReference<>(config));
+    }
+
+    /**
+     * Configure the query builder.
+     * <p>
+     * A configured {@link QueryBuilderFactory} can be used to skip this step.
+     *
+     * @param config The config of the {@link QueryBuilder}
+     * @return The {@link QueryBuilder} in {@link QueryStage} with the config set.
+     */
     QueryStage<T> configure(AtomicReference<QueryBuilderConfig> config);
 
     /**

@@ -8,6 +8,10 @@ package de.chojo.sqlutil.databases;
 
 import de.chojo.sqlutil.jdbc.JdbcConfig;
 
+/**
+ * Represents a default database
+ * @param <T> database type defined by the {@link SqlType}
+ */
 public abstract class DefaultType<T extends JdbcConfig<?>> implements SqlType<T> {
 
     @Override
