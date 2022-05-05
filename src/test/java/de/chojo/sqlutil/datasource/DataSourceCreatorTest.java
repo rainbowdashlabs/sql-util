@@ -17,7 +17,7 @@ class DataSourceCreatorTest {
 
     // These tests can not be executed without a running database sadly.
 
-    @Test
+    //@Test
     public void postgresTest() throws SQLException {
         var build = DataSourceCreator.create(SqlType.POSTGRES)
                 .configure(builder -> builder
@@ -34,7 +34,7 @@ class DataSourceCreatorTest {
         Assertions.assertTrue(build.getConnection().isValid(1000));
     }
 
-    @Test
+    //@Test
     public void mariadbTest() throws SQLException {
         var build = DataSourceCreator.create(SqlType.MARIADB)
                 .configure(builder -> builder
