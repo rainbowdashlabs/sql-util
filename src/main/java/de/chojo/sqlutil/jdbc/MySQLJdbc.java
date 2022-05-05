@@ -20,7 +20,7 @@ public class MySQLJdbc extends RemoteJdbcConfig<MySQLJdbc> {
      * @return builder instance
      */
     public MySQLJdbc connectTimeout(int millis) {
-        return addProperty("connectTimeout", millis);
+        return addParameter("connectTimeout", millis);
     }
 
 
@@ -30,7 +30,7 @@ public class MySQLJdbc extends RemoteJdbcConfig<MySQLJdbc> {
      * @see <a href="https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html/">MySql parameter</a>
      */
     @Override
-    public <V> MySQLJdbc addProperty(String key, V value) {
-        return super.addProperty(key, value);
+    public <V> MySQLJdbc addParameter(String key, V value) {
+        return super.addParameter(key, value);
     }
 }

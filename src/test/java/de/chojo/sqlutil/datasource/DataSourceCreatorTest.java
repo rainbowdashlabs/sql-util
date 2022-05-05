@@ -7,16 +7,17 @@
 package de.chojo.sqlutil.datasource;
 
 import de.chojo.sqlutil.databases.SqlType;
+import de.chojo.sqlutil.jdbc.SqLiteJdbc;
 import org.junit.jupiter.api.Assertions;
-import org.mariadb.jdbc.MariaDbDataSource;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 
 class DataSourceCreatorTest {
 
-    // These tests can be executed without a running database sadly.
+    // These tests can not be executed without a running database sadly.
 
-    //@Test
+    @Test
     public void postgresTest() throws SQLException {
         var build = DataSourceCreator.create(SqlType.POSTGRES)
                 .configure(builder -> builder
@@ -33,15 +34,27 @@ class DataSourceCreatorTest {
         Assertions.assertTrue(build.getConnection().isValid(1000));
     }
 
-    //@Test
+    @Test
     public void mariadbTest() throws SQLException {
         var build = DataSourceCreator.create(SqlType.MARIADB)
                 .configure(builder -> builder
                         .host("localhost")
-                        .database("test_db")
+                        .database("public")
                         .port(3306)
                         .user("root")
                         .password("root"))
+                .create()
+                .withMaximumPoolSize(20)
+                .withMinimumIdle(2)
+                .build();
+
+        Assertions.assertTrue(build.getConnection().isValid(1000));
+    }
+
+    @Test
+    public void sqliteTest() throws SQLException {
+        var build = DataSourceCreator.create(SqlType.SQLITE)
+                .configure(SqLiteJdbc::memory)
                 .create()
                 .withMaximumPoolSize(20)
                 .withMinimumIdle(2)
