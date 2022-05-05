@@ -4,6 +4,8 @@
 [![Sonatype Nexus (Development)](https://img.shields.io/nexus/maven-dev/de.chojo/sql-util?label=DEV&logo=Release&server=https%3A%2F%2Feldonexus.de&style=for-the-badge)][nexus_dev]
 [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/de.chojo/sql-util?color=orange&label=Snapshot&server=https%3A%2F%2Feldonexus.de&style=for-the-badge)][nexus_releases]
 
+### [Javadocs](https://rainbowdashlabs.github.io/sql-util/)
+
 # SQL-Util
 
 This project contains various functions I use for sql handling.
