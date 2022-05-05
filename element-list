@@ -1,0 +1,10 @@
+de.chojo.sqlutil.base
+de.chojo.sqlutil.conversion
+de.chojo.sqlutil.datasource
+de.chojo.sqlutil.datasource.stage
+de.chojo.sqlutil.exceptions
+de.chojo.sqlutil.logging
+de.chojo.sqlutil.updater
+de.chojo.sqlutil.wrapper
+de.chojo.sqlutil.wrapper.exception
+de.chojo.sqlutil.wrapper.stage
