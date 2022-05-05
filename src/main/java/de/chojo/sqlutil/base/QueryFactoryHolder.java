@@ -11,6 +11,7 @@ import de.chojo.sqlutil.wrapper.QueryBuilderFactory;
 import de.chojo.sqlutil.wrapper.stage.QueryStage;
 
 import javax.sql.DataSource;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Base class which provides a factory for easy usage.
@@ -28,7 +29,11 @@ public abstract class QueryFactoryHolder extends DataHolder {
      */
     public QueryFactoryHolder(DataSource dataSource, QueryBuilderConfig config) {
         super(dataSource);
-        factory = new QueryBuilderFactory(config, dataSource);
+        factory = new QueryBuilderFactory(new AtomicReference<>(config), dataSource);
+    }
+    public QueryFactoryHolder(DataSource dataSource) {
+        super(dataSource);
+        factory = new QueryBuilderFactory(QueryBuilderConfig.defaultConfig(), dataSource);
     }
 
     /**

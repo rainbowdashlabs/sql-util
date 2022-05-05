@@ -39,6 +39,10 @@ public abstract class DataHolder {
         this.dataSource = dataSource;
     }
 
+    public static void setupLogger(LoggerAdapter adapter) {
+        log = adapter;
+    }
+
     /**
      * Get a query builder for easy sql execution.
      *
@@ -78,9 +82,5 @@ public abstract class DataHolder {
      */
     protected Connection getConnection() throws SQLException {
         return dataSource.getConnection();
-    }
-
-    public static void setupLogger(LoggerAdapter adapter) {
-        log = adapter;
     }
 }
