@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "de.chojo"
-version = "1.4.1"
+version = "1.4.2"
 val testContainersVersion = "1.16.3"
 
 repositories {
@@ -74,7 +74,7 @@ java {
     withSourcesJar()
     withJavadocJar()
 
-    sourceCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_15
 }
 
 
