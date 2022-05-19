@@ -36,7 +36,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     // testcontainers
-    testImplementation("org.testcontainers:junit-jupiter:1.17.1")
+    testImplementation("org.testcontainers:junit-jupiter:1.17.2")
     testImplementation ("org.testcontainers", "testcontainers", testContainersVersion)
     implementation(platform("org.testcontainers:testcontainers-bom:$testContainersVersion"))
     // container
