@@ -8,7 +8,7 @@ plugins {
 
 group = "de.chojo"
 version = "1.4.6"
-val testContainersVersion = "1.17.2"
+val testContainersVersion = "1.17.3"
 
 repositories {
     mavenCentral()
