@@ -31,7 +31,7 @@ dependencies {
     testImplementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.6")
     testImplementation("mysql", "mysql-connector-java", "8.0.30")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     // testcontainers
