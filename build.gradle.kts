@@ -28,7 +28,7 @@ dependencies {
     // database driver
     testImplementation("org.xerial:sqlite-jdbc:3.36.0.3")
     testImplementation("org.postgresql", "postgresql", "42.4.0")
-    testImplementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.6")
+    testImplementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.7")
     testImplementation("mysql", "mysql-connector-java", "8.0.30")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
