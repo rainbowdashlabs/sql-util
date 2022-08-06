@@ -26,7 +26,7 @@ dependencies {
     api("org.jetbrains", "annotations", "23.0.0")
 
     // database driver
-    testImplementation("org.xerial:sqlite-jdbc:3.36.0.3")
+    testImplementation("org.xerial:sqlite-jdbc:3.39.2.0")
     testImplementation("org.postgresql", "postgresql", "42.4.0")
     testImplementation("org.mariadb.jdbc", "mariadb-java-client", "3.0.7")
     testImplementation("mysql", "mysql-connector-java", "8.0.30")
