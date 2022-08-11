@@ -12,6 +12,7 @@ import de.chojo.sqlutil.exceptions.ThrowingFunction;
 import de.chojo.sqlutil.wrapper.exception.QueryExecutionException;
 import de.chojo.sqlutil.wrapper.exception.WrappedQueryExecutionException;
 import de.chojo.sqlutil.wrapper.stage.ConfigurationStage;
+import de.chojo.sqlutil.wrapper.stage.InsertStage;
 import de.chojo.sqlutil.wrapper.stage.QueryStage;
 import de.chojo.sqlutil.wrapper.stage.ResultStage;
 import de.chojo.sqlutil.wrapper.stage.RetrievalStage;
@@ -55,7 +56,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @param <T> type of query return type
  */
-public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>, QueryStage<T>, StatementStage<T>, ResultStage<T>, RetrievalStage<T>, UpdateStage {
+public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>, QueryStage<T>, StatementStage<T>, ResultStage<T>, RetrievalStage<T>, InsertStage {
     private final Queue<QueryTask> tasks = new ArrayDeque<>();
     private final QueryExecutionException executionException;
     private final WrappedQueryExecutionException wrappedExecutionException;
@@ -147,6 +148,12 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
     public UpdateStage update() {
         currResultMapper = s -> null;
         queueTask();
+        return this;
+    }
+
+    @Override
+    public InsertStage insert() {
+        update();
         return this;
     }
 
