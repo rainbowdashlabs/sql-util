@@ -28,7 +28,11 @@ public abstract class JdbcConfig<T extends JdbcConfig<?>> {
     }
 
     public <V extends Driver> T setDriverClass(V driverClass) {
-        return setDriverClass(driverClass.getClass().getName());
+        return setDriverClass(driverClass.getClass());
+    }
+    
+    public T setDriverClass(Class<? extends Driver> driverClass) {
+        return setDriverClass(driverClass.getName());
     }
 
     /**
