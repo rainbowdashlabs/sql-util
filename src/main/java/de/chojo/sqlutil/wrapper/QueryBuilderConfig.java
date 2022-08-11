@@ -6,6 +6,7 @@
 
 package de.chojo.sqlutil.wrapper;
 
+import de.chojo.sqlutil.exceptions.ExceptionTransformer;
 import de.chojo.sqlutil.wrapper.exception.QueryExecutionException;
 
 import java.sql.SQLException;
@@ -77,7 +78,11 @@ public class QueryBuilderConfig {
     public static class Builder {
         boolean throwing;
         boolean atomic = true;
-        Consumer<SQLException> exceptionHandler;
+        Consumer<SQLException> exceptionHandler = throwables -> {
+            System.err.println(ExceptionTransformer.prettyException(throwables));
+            throwables.printStackTrace();
+        };
+
         private ExecutorService executorService = ForkJoinPool.commonPool();
 
         /**
@@ -135,8 +140,6 @@ public class QueryBuilderConfig {
         public QueryBuilderConfig build() {
             return new QueryBuilderConfig(throwing, atomic, exceptionHandler, executorService);
         }
-
-
     }
     public static void setDefault(QueryBuilderConfig config) {
         DEFAULT.set(config);
