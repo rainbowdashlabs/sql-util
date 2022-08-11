@@ -41,6 +41,14 @@ public interface InsertStage extends UpdateStage {
     Optional<Long> keySync();
 
     /**
+     * Retrieve all created keys as a list
+     *
+     * @return A list of created key.
+     * @throws WrappedQueryExecutionException if {@link QueryBuilderConfig#isThrowing()} is set to {@code true} and a exceptions occurs during query building or execution
+     */
+    List<Long> keysSync();
+
+    /**
      * Retrieve all created keys async as a list
      *
      * @return A {@link CompletableFuture} to retrieve the data.

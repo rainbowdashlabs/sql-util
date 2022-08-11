@@ -385,7 +385,7 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
             List<Long> results = new ArrayList<>();
             try (var stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
                 statementConsumer.accept(stmt);
-                stmt.executeQuery();
+                stmt.execute();
                 var generatedKeys = stmt.getGeneratedKeys();
                 while (generatedKeys.next()) results.add(generatedKeys.getLong(1));
             } catch (SQLException e) {
@@ -397,7 +397,7 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
         public Optional<Long> retrieveKey(Connection conn) throws SQLException {
             try (var stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
                 statementConsumer.accept(stmt);
-                stmt.executeQuery();
+                stmt.execute();
                 var generatedKeys = stmt.getGeneratedKeys();
                 if (generatedKeys.next()) return Optional.of(generatedKeys.getLong(1));
             } catch (SQLException e) {
