@@ -17,6 +17,7 @@ import de.chojo.sqlutil.wrapper.stage.QueryStage;
 import de.chojo.sqlutil.wrapper.stage.ResultStage;
 import de.chojo.sqlutil.wrapper.stage.RetrievalStage;
 import de.chojo.sqlutil.wrapper.stage.StatementStage;
+import de.chojo.sqlutil.wrapper.stage.UpdateResult;
 import de.chojo.sqlutil.wrapper.stage.UpdateStage;
 
 import javax.sql.DataSource;
@@ -65,7 +66,7 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
     private ThrowingFunction<T, ResultSet, SQLException> currResultMapper;
     private AtomicReference<QueryBuilderConfig> config;
 
-    private QueryBuilder(DataSource dataSource, Class<T> clazz) {
+    private QueryBuilder(DataSource dataSource) {
         super(dataSource);
         executionException = new QueryExecutionException("An error occurred while executing a query.");
         wrappedExecutionException = new WrappedQueryExecutionException("An error occurred while executing a query.");
@@ -80,7 +81,7 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
      * @return a new query builder in a {@link QueryStage}
      */
     public static <T> ConfigurationStage<T> builder(DataSource source, Class<T> clazz) {
-        return new QueryBuilder<>(source, clazz);
+        return new QueryBuilder<>(source);
     }
 
     /**
@@ -90,7 +91,7 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
      * @return a new query builder in a {@link QueryStage}
      */
     public static ConfigurationStage<?> builder(DataSource source) {
-        return new QueryBuilder<>(source, null);
+        return new QueryBuilder<>(source);
     }
 
     // CONFIGURATION STAGE
@@ -276,6 +277,21 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
     }
 
     // UPDATE STAGE
+
+    @Override
+    public UpdateResult sendSync() {
+        return new UpdateResult(executeSync());
+    }
+
+    @Override
+    public CompletableFuture<UpdateResult> send() {
+        return CompletableFuture.supplyAsync(() -> new UpdateResult(executeSync()));
+    }
+
+    @Override
+    public CompletableFuture<UpdateResult> send(Executor executor) {
+        return CompletableFuture.supplyAsync(() -> new UpdateResult(executeSync()), executor);
+    }
 
     @Override
     public CompletableFuture<Integer> execute() {
