@@ -399,7 +399,7 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
                 statementConsumer.accept(stmt);
                 stmt.executeQuery();
                 var generatedKeys = stmt.getGeneratedKeys();
-                if (generatedKeys.next()) Optional.of(generatedKeys.getLong(1));
+                if (generatedKeys.next()) return Optional.of(generatedKeys.getLong(1));
             } catch (SQLException e) {
                 initAndThrow(e);
             }
