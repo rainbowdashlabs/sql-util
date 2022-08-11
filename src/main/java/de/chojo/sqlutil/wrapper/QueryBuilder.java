@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -63,7 +63,6 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
     private ThrowingConsumer<PreparedStatement, SQLException> currStatementConsumer;
     private ThrowingFunction<T, ResultSet, SQLException> currResultMapper;
     private AtomicReference<QueryBuilderConfig> config;
-    private ExecutorService executorService;
 
     private QueryBuilder(DataSource dataSource, Class<T> clazz) {
         super(dataSource);
@@ -130,7 +129,7 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
     }
 
     @Override
-    public ResultStage<T> paramsBuilder(ThrowingConsumer<ParamBuilder, SQLException> params) {
+    public ResultStage<T> parameter(ThrowingConsumer<ParamBuilder, SQLException> params) {
         this.currStatementConsumer = stmt -> params.accept(new ParamBuilder(stmt));
         return this;
     }
@@ -192,6 +191,31 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
     }
 
     @Override
+    public CompletableFuture<List<Long>> keys() {
+        return CompletableFuture.supplyAsync(this::keysSync);
+    }
+
+    @Override
+    public CompletableFuture<List<Long>> keys(Executor executor) {
+        return CompletableFuture.supplyAsync(this::keysSync, executor);
+    }
+
+    @Override
+    public List<Long> keysSync() {
+        try (var conn = getConnection()) {
+            autoCommit(conn);
+            var results = executeAndGetLast(conn).retrieveKeys(conn);
+            commit(conn);
+            return results;
+        } catch (QueryExecutionException e) {
+            logDbError(e);
+        } catch (SQLException e) {
+            handleException(e);
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
     public void logDbError(SQLException e) {
         config.get().exceptionHandler().ifPresentOrElse(consumer -> consumer.accept(e), () -> super.logDbError(e));
     }
@@ -213,6 +237,29 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
         try (var conn = getConnection()) {
             autoCommit(conn);
             var result = executeAndGetLast(conn).retrieveResult(conn);
+            commit(conn);
+            return result;
+        } catch (SQLException e) {
+            handleException(e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public CompletableFuture<Optional<Long>> key() {
+        return CompletableFuture.supplyAsync(this::keySync);
+    }
+
+    @Override
+    public CompletableFuture<Optional<Long>> key(Executor executor) {
+        return CompletableFuture.supplyAsync(this::keySync, executor);
+    }
+
+    @Override
+    public Optional<Long> keySync() {
+        try (var conn = getConnection()) {
+            autoCommit(conn);
+            var result = executeAndGetLast(conn).retrieveKey(conn);
             commit(conn);
             return result;
         } catch (SQLException e) {
@@ -325,6 +372,31 @@ public class QueryBuilder<T> extends DataHolder implements ConfigurationStage<T>
             } catch (SQLException e) {
                 initAndThrow(e);
             }
+        }
+
+        public List<Long> retrieveKeys(Connection conn) throws SQLException {
+            List<Long> results = new ArrayList<>();
+            try (var stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                statementConsumer.accept(stmt);
+                stmt.executeQuery();
+                var generatedKeys = stmt.getGeneratedKeys();
+                while (generatedKeys.next()) results.add(generatedKeys.getLong(1));
+            } catch (SQLException e) {
+                initAndThrow(e);
+            }
+            return results;
+        }
+
+        public Optional<Long> retrieveKey(Connection conn) throws SQLException {
+            try (var stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                statementConsumer.accept(stmt);
+                stmt.executeQuery();
+                var generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) Optional.of(generatedKeys.getLong(1));
+            } catch (SQLException e) {
+                initAndThrow(e);
+            }
+            return Optional.empty();
         }
 
         public int update(Connection conn) throws SQLException {
