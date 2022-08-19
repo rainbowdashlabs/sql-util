@@ -1,3 +1,5 @@
+# sql-util is now [SADU](https://github.com/RainbowDashLabs/sadu)
+
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/RainbowDashLabs/sql-util/Verify%20state?style=for-the-badge&label=Build)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/RainbowDashLabs/sql-util/Publish%20to%20Nexus?style=for-the-badge&label=Publish)
 [![Sonatype Nexus (Releases)](https://img.shields.io/nexus/maven-releases/de.chojo/sql-util?label=Release&logo=Release&server=https%3A%2F%2Feldonexus.de&style=for-the-badge)][nexus_releases]
